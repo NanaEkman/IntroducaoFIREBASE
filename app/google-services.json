@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "229163193951",
+    "project_id": "introducao-firebase---dd-34ebd",
+    "storage_bucket": "introducao-firebase---dd-34ebd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:229163193951:android:c66f2bf24542c91ac5edea",
+        "android_client_info": {
+          "package_name": "ddm.nana.introducaofirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "229163193951-q0abgug4u535mh1h6ab3pfg4fbn2q0fu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhx_6Him2QzGWLY8KP8DQmO0kCxWKufgE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "229163193951-q0abgug4u535mh1h6ab3pfg4fbn2q0fu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
