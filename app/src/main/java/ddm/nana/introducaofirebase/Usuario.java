@@ -4,11 +4,11 @@ public class Usuario {
     // Atributos
     private String nome;
     private String sobrenome;
-    private int idade;
+    private String telefone;
 
     // Construtor
-    public Usuario ( String n, String s, int i ) {
-        nome = n; sobrenome = s; idade = i;
+    public Usuario ( String n, String s, String t ) {
+        nome = n; sobrenome = s; telefone = t;
     }
 
     // É obrigatório ter um construtor vazio!!!!
@@ -21,13 +21,13 @@ public class Usuario {
     // Marca todos os atributos, clica OK.
     public String getNome() { return nome; }
 
-    public void setNome(String nome) { this.nome = nome; }
+    public void setNome(String n) { this.nome = n; }
 
     public String getSobrenome() { return sobrenome; }
 
     public void setSobrenome(String s) { this.sobrenome = s; }
 
-    public int getIdade() { return idade; }
+    public String getTelefone() { return telefone; }
 
-    public void setIdade(int idade) { this.idade = idade; }
+    public void setTelefone(String t) { this.telefone = t; }
 }
