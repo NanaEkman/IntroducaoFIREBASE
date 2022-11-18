@@ -5,12 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.firebase.ui.database.FirebaseListOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,18 +35,25 @@ public class MainActivity extends AppCompatActivity {
     // Criando uma referência para o nó "usuarios" da árvore.
     // Isto é, a referência vai "apontar" para o nó "usuarios".
     // Se o nó não existir, ele cria.
-    private DatabaseReference contatos = BD.child("contatos");
+    //private DatabaseReference contatos = BD.child("contatos");
+
+    // Variável para usar o adapter do firebase
+    private ContatosAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DatabaseReference contatos = BD.child("contatos");
+
         // Ligando os atributos com a interface gráfica:
         txtNome = findViewById( R.id.txtNome );
         txtSobrenome = findViewById( R.id.txtSobrenome );
         txtTelefone = findViewById( R.id.txtTelefone);
         btnEnviar = findViewById( R.id.btnSalvar);
+        listaContatos = findViewById( R.id.listaContatos);
 
         // Criando o escutador do botão enviar
         btnEnviar.setOnClickListener( new EscutadorBotao() );
@@ -67,6 +77,23 @@ public class MainActivity extends AppCompatActivity {
         // ambos como nós filhos do nó "usuarios":
         //usuarios.child( "001" ).setValue( u1 );
         //usuarios.child( "002" ).setValue( u2 );
+
+        // Criando objeto com parâmetros para o adapter:
+        FirebaseListOptions<Contato> options = new FirebaseListOptions.Builder<Contato>()
+                .setLayout(R.layout.contato)
+                .setQuery(contatos, Contato.class)
+                .setLifecycleOwner( this )
+                .build();
+
+        // Criando o objeto adapter (usando os parâmetros criados acima):
+        adapter = new ContatosAdapter(options);
+
+        // Colocando o adapter no ListView:
+        listaContatos.setAdapter(adapter);
+
+        // Criando e associando o escutador de cliques na lista:
+        listaContatos.setOnItemClickListener( new EscutadorCliqueLista() );
+
     }
 
     // classe do escutador do botão
@@ -74,20 +101,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
 
-            // variáveis para os dados digitados nas caixas
-            String nome, sobren, tele;
+            // Referência para o nó principal deste exemplo:
+            DatabaseReference contatos = BD.child("contatos");
 
             // Pegando os dados nas caixas.
             // ATENÇÃO!! não vamos fazer filtros de erros!
-            nome = txtNome.getText().toString();
-            sobren = txtSobrenome.getText().toString();
-            tele = txtTelefone.getText().toString();
-
-            // Criando o objeto Usuario, com os dados acima
-            Usuario u = new Usuario( nome, sobren, tele );
+            String nome = txtNome.getText().toString();
+            String sobrenome = txtSobrenome.getText().toString();
+            String telefone = txtTelefone.getText().toString();
 
             // Gerando chave aleatória
             String chave = contatos.push().getKey();
+
+            // Criando o objeto Usuario, com os dados acima
+            Contato u = new Contato( chave, nome, sobrenome, telefone );
 
             // Vamos ter apenas um nó, "dados", então podemos gravar direto
             contatos.child(chave).setValue( u );
@@ -96,12 +123,20 @@ public class MainActivity extends AppCompatActivity {
             // OBS!!! Apenas para uma única leitura.
             // Ou seja, cada vez que apertar o botão, cria o escutador, associa,
             // ele faz seu trabalho, e "morre".
-            contatos.addListenerForSingleValueEvent( new EscutadorFirebase() );
+            //contatos.addListenerForSingleValueEvent( new EscutadorFirebase() );
+
+            // Limpando as caixas, para próxima digitação:
+            txtNome.setText("");
+            txtSobrenome.setText("");
+            txtTelefone.setText("");
+
+            // Colocando o cursor (o foco) de volta na caixa nome:
+            txtNome.requestFocus();
         }
     }
 
     // Classe interna do escutador do Firebase:
-    private class EscutadorFirebase implements ValueEventListener {
+    /*private class EscutadorFirebase implements ValueEventListener {
 
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -118,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // A variável "dataSnapUsuario" tem um dataSnapshot com apenas 1 único usuário lido.
                     // Vamos extrair esse usuário!
-                    Usuario u = datasnapContatos.getValue( Usuario.class );
+                    Contato u = datasnapContatos.getValue( Contato.class );
 
                     // Agora é só exibir os dados deste usuário no toast...
                     n = u.getNome();
@@ -132,6 +167,51 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCancelled(@NonNull DatabaseError databaseError) {
         }
+    }*/
+
+    // Classe interna do adapter do Firebase:
+    private class ContatosAdapter extends FirebaseListAdapter<Contato> {
+
+        // Construtor: receita de bolo!
+        // Recebe um objeto do tipo FirebaseListOptions,
+        // e passa ele para o construtor da classe mãe.
+        // Veremos como criar este objeto mais a frente.
+        public ContatosAdapter(FirebaseListOptions options) {
+            super( options );
+        }
+
+        // Método que coloca dados ("povoa") a View (o desenho) do item da lista.
+        // Recebe o objeto com os dados (vindos do Firebase), e a View já inflada.
+        // Basta acessarmos os dados (nome e email) e colocarmos nos objetos corretos
+        // dentro da View.
+        @Override
+        protected void populateView(View v, Contato c, int position) {
+
+            // Acessa os objetos gráficos dentro do desenho do item da lista:
+            TextView lblNome = v.findViewById( R.id.lblNome );
+            TextView lblSobrenome = v.findViewById( R.id.lblSobrenome );
+            TextView lblTelefone = v.findViewById( R.id.lblTelefone );
+
+            // Coloca dados do objeto Contato (c) nesses objetos gráficos:
+            lblNome.setText( c.getNome() );
+            lblSobrenome.setText( c.getSobrenome() );
+            lblTelefone.setText( c.getTelefone() );
+        }
     }
 
+    // Classe interna do escutador de clicks na lista:
+    private class EscutadorCliqueLista implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+            // Recuperando o objeto que está na posição "i" da lista:
+            Contato c = adapter.getItem(i);
+
+            // Exibindo seus dados em um Toast:
+            Toast.makeText(getApplicationContext(), c.getNome() +
+                            " " + c.getSobrenome() + " - " + c.getTelefone(),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 }

@@ -1,18 +1,19 @@
 package ddm.nana.introducaofirebase;
 
-public class Usuario {
+public class Contato {
     // Atributos
+    private String chave;
     private String nome;
     private String sobrenome;
     private String telefone;
 
     // Construtor
-    public Usuario ( String n, String s, String t ) {
-        nome = n; sobrenome = s; telefone = t;
+    public Contato(String c, String n, String s, String t ) {
+        nome = n; sobrenome = s; telefone = t; chave = c;
     }
 
     // É obrigatório ter um construtor vazio!!!!
-    public Usuario() {
+    public Contato() {
     }
 
     // É obrigatório ter todos os getters e setters!!
